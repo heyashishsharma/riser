@@ -60,6 +60,9 @@ export default function Home() {
               </button>
               {session ? (
                 <div className="flex items-center gap-3">
+                  <a href="/vault" className="text-sm font-semibold text-[#4a3aff] hover:text-[#3b2de0] px-2 transition-colors">
+                    My Vault
+                  </a>
                   {session.user?.image && (
                     <img src={session.user.image} alt="Profile" className="w-9 h-9 rounded-full border border-gray-200" />
                   )}

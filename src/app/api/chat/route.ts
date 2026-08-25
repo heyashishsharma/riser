@@ -1,5 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route";
+import { db } from "@/lib/firebase";
 
 export async function POST(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -53,7 +56,7 @@ Respond strictly in JSON format matching this schema:
 }
 `;
 
-    const modelsToTry = ["gemini-3.5-flash", "gemini-3.5-pro", "gemini-3.0-flash", "gemini-3.0-pro"];
+    const modelsToTry = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-2.5-flash"];
     let responseText = "";
     let lastError: any = null;
 
@@ -92,6 +95,24 @@ Respond strictly in JSON format matching this schema:
         category: filter && filter !== 'All' ? filter : "General",
         response: responseText
       };
+    }
+
+    // Save to Firebase Vault if user is logged in
+    try {
+      const session = await getServerSession(authOptions);
+      if (session?.user?.email) {
+        await db.collection("user_history").add({
+          email: session.user.email,
+          query: query,
+          filter: filter || "All",
+          category: data.category,
+          response: data.response,
+          createdAt: new Date(),
+        });
+      }
+    } catch (firebaseErr) {
+      console.error("Failed to save to Firebase Vault:", firebaseErr);
+      // We don't fail the request if Firebase fails, just log it.
     }
 
     return NextResponse.json(data);
