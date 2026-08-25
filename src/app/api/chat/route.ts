@@ -24,6 +24,26 @@ export async function POST(req: Request) {
       ? `The user has explicitly selected the filter: "${filter}". Focus your response heavily on ${filter}. `
       : `If the query does not contain a link, classify this query into one of the following categories: Trending, Ideas, Campaigns, Community, Analytics, Sponsorships, or General. `;
 
+    // Fetch Brand Kit context if user is logged in
+    let brandContext = "";
+    try {
+      const session = await getServerSession(authOptions);
+      if (session?.user?.email) {
+        const profileDoc = await db.collection("user_profiles").doc(session.user.email).get();
+        if (profileDoc.exists) {
+          const { niche, tone, targetAudience } = profileDoc.data() || {};
+          if (niche || tone || targetAudience) {
+            brandContext = `\n\nCRITICAL BRAND CONTEXT:\nYou are writing this content for a specific brand/creator. Always apply the following context seamlessly to your response without explicitly mentioning that you were asked to do so:\n`;
+            if (niche) brandContext += `- **Their Niche/Industry**: ${niche}\n`;
+            if (tone) brandContext += `- **Their Brand Voice/Tone**: ${tone}\n`;
+            if (targetAudience) brandContext += `- **Their Target Audience**: ${targetAudience}\n`;
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch brand kit context", e);
+    }
+
     let linkInstructions = (filter === 'Campaigns' || filter === 'Sponsors')
       ? `\n\nCRITICAL FOR CAMPAIGNS & SPONSORS: You MUST provide reference links for campaigns and sponsors. Use Markdown link syntax (e.g., [Example Brand](https://example.com)). If the website is unable to showcase specific real ones, provide highly realistic simulated reference links or well-known platform links (like [Instagram Creator Marketplace](https://creators.instagram.com) or [YouTube BrandConnect](https://brandconnect.youtube.com)).`
       : '';
@@ -37,7 +57,7 @@ export async function POST(req: Request) {
 You are an expert AI assistant for a social media growth and influencer platform called "RISER".
 The user has asked the following question/query: "${query}"
 
-${filterContext}
+${filterContext}${brandContext}
 
 First, check if the query contains a link or URL to a social media profile or post (e.g. Instagram, TikTok, YouTube). 
 If it DOES contain a link:
@@ -108,6 +128,7 @@ Respond strictly in JSON format matching this schema:
           category: data.category,
           response: data.response,
           createdAt: new Date(),
+          isFavorite: false,
         });
       }
     } catch (firebaseErr) {

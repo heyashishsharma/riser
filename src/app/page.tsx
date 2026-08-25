@@ -60,6 +60,12 @@ export default function Home() {
               </button>
               {session ? (
                 <div className="flex items-center gap-3">
+                  <a href="/dashboard" className="text-sm font-semibold text-gray-600 hover:text-gray-900 px-2 transition-colors">
+                    Dashboard
+                  </a>
+                  <a href="/settings" className="text-sm font-semibold text-gray-600 hover:text-gray-900 px-2 transition-colors">
+                    Brand Kit
+                  </a>
                   <a href="/vault" className="text-sm font-semibold text-[#4a3aff] hover:text-[#3b2de0] px-2 transition-colors">
                     My Vault
                   </a>
