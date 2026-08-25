@@ -44,13 +44,19 @@ export async function POST(req: Request) {
       console.error("Failed to fetch brand kit context", e);
     }
 
-    let linkInstructions = (filter === 'Campaigns' || filter === 'Sponsors')
-      ? `\n\nCRITICAL FOR CAMPAIGNS & SPONSORS: You MUST provide reference links for campaigns and sponsors. Use Markdown link syntax (e.g., [Example Brand](https://example.com)). If the website is unable to showcase specific real ones, provide highly realistic simulated reference links or well-known platform links (like [Instagram Creator Marketplace](https://creators.instagram.com) or [YouTube BrandConnect](https://brandconnect.youtube.com)).`
+    let linkInstructions = (filter === 'Sponsors')
+      ? `\n\nCRITICAL FOR SPONSORS: You MUST provide reference links for sponsors. Use Markdown link syntax (e.g., [Example Brand](https://example.com)). If the website is unable to showcase specific real ones, provide highly realistic simulated reference links.`
       : '';
 
     if (filter === 'Script') {
-      filterContext = `The user has explicitly selected the filter: "Script". You must act as an elite, professional scriptwriter and content strategist. Your goal is to write a highly engaging, well-structured script based on the user's prompt. Pay close attention to pacing, tone, and audience retention hooks. Write the script in the specific language requested by the user, if mentioned in their query. `;
-      linkInstructions = `\n\nCRITICAL FOR SCRIPT WRITING: Present the script in a highly professional, uncluttered Markdown format. Use clear headings for sections (e.g., **Hook (0-3s)**, **Body**, **Call to Action**). DO NOT use tables, as they cause horizontal scrolling. Instead, use a strict vertical layout for each segment. For example, use bold labels like **🎥 Visual:** followed by **🎙️ Audio/Voiceover:** on the next line. Format the dialogue clearly so a creator can read it effortlessly during filming. The script must be detailed, logically paced, and impeccably organized.`;
+      filterContext = `The user has explicitly selected the filter: "Script". You must act as an elite, professional scriptwriter and content strategist. Your goal is to write a highly engaging, well-structured script based on the user's prompt. Pay close attention to pacing, tone, and audience retention hooks. `;
+      linkInstructions = `\n\nCRITICAL FOR SCRIPT WRITING: Present the script in a highly professional, uncluttered Markdown format. Use clear headings for sections. DO NOT use tables. Format the dialogue clearly so a creator can read it effortlessly during filming.`;
+    } else if (filter === 'Hooks') {
+      filterContext = `The user has explicitly selected the filter: "Hooks". Act as a master viral copywriter. Your ONLY goal is to generate exactly 5 completely different, highly optimized 3-second Hooks for the user's topic. `;
+      linkInstructions = `\n\nCRITICAL FOR HOOKS: Present the 5 hooks cleanly. For each hook, provide the "Hook Text", the "Hook Style" (e.g. Aggressive, Curiosity, Emotional), and a "Viral Score" (e.g. 95/100) based on its expected audience retention. DO NOT generate an entire script, ONLY the hooks.`;
+    } else if (filter === 'Campaigns') {
+      filterContext = `The user has explicitly selected the filter: "Campaigns". Act as an elite Content Strategist. Your goal is to map out a highly engaging 30-day content calendar. `;
+      linkInstructions = `\n\nCRITICAL FOR CAMPAIGNS: You MUST use a Markdown table to display the 30-day calendar (you don't have to do all 30 days if it's too long, just do the major posting days). The table headers should be | Day | Content Type | Hook Idea | Call to Action |. Provide unique, actionable ideas for each row.`;
     }
 
     const prompt = `

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { TrendingUp, Activity, Eye, Zap } from "lucide-react";
 import DashboardCharts from "./DashboardCharts";
+import { AnimatedStatCard, AnimatedChartArea } from "./DashboardAnimatedWrapper";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -54,7 +55,7 @@ export default async function DashboardPage() {
   const latestViews = dataPoints[dataPoints.length - 1]?.views || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 md:py-12 px-3 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-end mb-8 border-b border-gray-200 pb-5">
           <div>
@@ -71,51 +72,59 @@ export default async function DashboardPage() {
 
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-           <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
-                 <Zap className="w-7 h-7" />
-              </div>
-              <div>
-                 <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Current Viral Potential</p>
-                 <p className="text-3xl font-extrabold text-gray-900 mt-1">{latestViral}%</p>
-              </div>
-           </div>
+           <AnimatedStatCard delay={0.1}>
+             <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow h-full">
+                <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
+                   <Zap className="w-7 h-7" />
+                </div>
+                <div>
+                   <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Current Viral Potential</p>
+                   <p className="text-3xl font-extrabold text-gray-900 mt-1">{latestViral}%</p>
+                </div>
+             </div>
+           </AnimatedStatCard>
            
-           <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center text-green-600">
-                 <Eye className="w-7 h-7" />
-              </div>
-              <div>
-                 <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Projected Reach</p>
-                 <p className="text-3xl font-extrabold text-gray-900 mt-1">{latestViews.toLocaleString()}</p>
-              </div>
-           </div>
+           <AnimatedStatCard delay={0.2}>
+             <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow h-full">
+                <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center text-green-600">
+                   <Eye className="w-7 h-7" />
+                </div>
+                <div>
+                   <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Projected Reach</p>
+                   <p className="text-3xl font-extrabold text-gray-900 mt-1">{latestViews.toLocaleString()}</p>
+                </div>
+             </div>
+           </AnimatedStatCard>
 
-           <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600">
-                 <TrendingUp className="w-7 h-7" />
-              </div>
-              <div>
-                 <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Total Analyses</p>
-                 <p className="text-3xl font-extrabold text-gray-900 mt-1">{snapshot.empty ? 0 : snapshot.size}</p>
-              </div>
-           </div>
+           <AnimatedStatCard delay={0.3}>
+             <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow h-full">
+                <div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600">
+                   <TrendingUp className="w-7 h-7" />
+                </div>
+                <div>
+                   <p className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Total Analyses</p>
+                   <p className="text-3xl font-extrabold text-gray-900 mt-1">{snapshot.empty ? 0 : snapshot.size}</p>
+                </div>
+             </div>
+           </AnimatedStatCard>
         </div>
 
         {/* Chart Area */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-             Performance Trajectory
-           </h2>
-           {snapshot.empty && (
-             <div className="bg-yellow-50 text-yellow-800 text-sm p-4 rounded-xl mb-6 border border-yellow-200 font-medium">
-               <strong>Demo Mode:</strong> You haven't run any "Analytics" searches yet. The chart below shows demo data. Try asking the AI to analyze a script to see your real data!
+        <AnimatedChartArea>
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+               Performance Trajectory
+             </h2>
+             {snapshot.empty && (
+               <div className="bg-yellow-50 text-yellow-800 text-sm p-4 rounded-xl mb-6 border border-yellow-200 font-medium">
+                 <strong>Demo Mode:</strong> You haven't run any "Analytics" searches yet. The chart below shows demo data. Try asking the AI to analyze a script to see your real data!
+               </div>
+             )}
+             <div className="h-[400px] w-full mt-4">
+                <DashboardCharts data={dataPoints} />
              </div>
-           )}
-           <div className="h-[400px] w-full mt-4">
-              <DashboardCharts data={dataPoints} />
-           </div>
-        </div>
+          </div>
+        </AnimatedChartArea>
 
       </div>
     </div>

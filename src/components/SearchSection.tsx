@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, Loader2, Send } from "lucide-react";
+import { Sparkles, Loader2, Send, Mic } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const FILTERS = ["All", "Analytics", "Sponsors", "Community", "Trends", "Script", "Campaigns"];
+const FILTERS = ["All", "Hooks", "Campaigns", "Analytics", "Sponsors", "Community", "Trends", "Script"];
 
 export default function SearchSection() {
   const [query, setQuery] = useState("");
@@ -13,6 +13,40 @@ export default function SearchSection() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{ category: string; response: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+
+  const handleVoice = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported in this browser. Try Chrome!");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    const initialQuery = query;
+
+    recognition.onstart = () => setIsListening(true);
+    
+    recognition.onresult = (event: any) => {
+      let finalTranscript = '';
+      for (let i = 0; i < event.results.length; ++i) {
+        finalTranscript += event.results[i][0].transcript;
+      }
+      setQuery(initialQuery ? `${initialQuery} ${finalTranscript}` : finalTranscript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error", event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,13 +94,21 @@ export default function SearchSection() {
           />
           
           {isLoading && (
-             <div className="flex items-center justify-center pr-2 sm:pr-4">
+             <div className="flex items-center justify-center pr-2">
                <Loader2 className="w-5 h-5 text-[#4a3aff] animate-spin" />
              </div>
           )}
 
-          <div className="flex items-center pr-1 sm:pr-2">
-            <button type="submit" className="text-[#4a3aff] hover:text-[#3b2de0] transition-colors ml-1 sm:ml-2 bg-[#f4f3ff] p-2 rounded-full">
+          <div className="flex items-center pr-1 sm:pr-2 gap-1">
+            <button 
+              type="button" 
+              onClick={handleVoice}
+              className={`transition-colors p-2 rounded-full ${isListening ? 'text-red-500 bg-red-50 animate-pulse' : 'text-gray-400 hover:text-[#4a3aff] hover:bg-[#f4f3ff]'}`}
+              title="Voice to Script"
+            >
+              <Mic className="w-5 h-5" />
+            </button>
+            <button type="submit" className="text-[#4a3aff] hover:text-[#3b2de0] transition-colors ml-1 bg-[#f4f3ff] p-2 rounded-full">
               <Send className="w-4 h-4" />
             </button>
           </div>
