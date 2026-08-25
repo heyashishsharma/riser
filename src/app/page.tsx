@@ -1,20 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useSession, signIn, signOut } from "next-auth/react";
-import {
+import { 
+  Bot, 
+  TrendingUp, 
+  Megaphone, 
+  BarChart, 
+  Briefcase, 
+  FileText, 
+  HeartHandshake,
+  Search,
+  Menu,
   Sparkles,
-  Heart,
   Users,
   Star,
-  Lightbulb,
-  Megaphone,
-  BarChart,
-  Bot,
-  Briefcase,
-  TrendingUp,
-  HeartHandshake,
-  FileText
+  Lightbulb
 } from "lucide-react";
 import SearchSection from "@/components/SearchSection";
 
@@ -29,6 +31,7 @@ function NavItem({ icon, label }: { icon: React.ReactNode, label: string }) {
 
 export default function Home() {
   const { data: session } = useSession();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-white">
@@ -55,26 +58,49 @@ export default function Home() {
 
             {/* Right: Actions */}
             <div className="flex items-center gap-3">
-              <button type="button" className="p-2.5 rounded-md bg-[#f4f3ff] text-[#4a3aff] hover:bg-[#e0e7ff] transition-colors cursor-pointer">
-                <Heart className="w-5 h-5 fill-current" />
-              </button>
               {session ? (
-                <div className="flex items-center gap-3">
-                  <a href="/dashboard" className="text-sm font-semibold text-gray-600 hover:text-gray-900 px-2 transition-colors">
-                    Dashboard
-                  </a>
-                  <a href="/settings" className="text-sm font-semibold text-gray-600 hover:text-gray-900 px-2 transition-colors">
-                    Brand Kit
-                  </a>
-                  <a href="/vault" className="text-sm font-semibold text-[#4a3aff] hover:text-[#3b2de0] px-2 transition-colors">
-                    My Vault
-                  </a>
-                  {session.user?.image && (
-                    <img src={session.user.image} alt="Profile" className="w-9 h-9 rounded-full border border-gray-200" />
-                  )}
-                  <button type="button" onClick={() => signOut()} className="bg-white text-gray-700 border border-gray-200 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm cursor-pointer">
-                    Sign Out
+                <div className="relative">
+                  <button 
+                    type="button"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors cursor-pointer border border-transparent hover:border-gray-200"
+                  >
+                    <Menu className="w-5 h-5 text-gray-600 ml-1" />
+                    {session.user?.image ? (
+                      <img src={session.user.image} alt="Profile" className="w-8 h-8 rounded-full border border-gray-200" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-[#4a3aff] text-white flex items-center justify-center font-bold text-xs">
+                        {session.user?.name?.[0] || 'U'}
+                      </div>
+                    )}
                   </button>
+
+                  {isMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                      <div className="px-4 py-3 border-b border-gray-50 mb-1">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{session.user?.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{session.user?.email}</p>
+                      </div>
+                      <a href="/dashboard" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#4a3aff] transition-colors">
+                        Dashboard
+                      </a>
+                      <a href="/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#4a3aff] transition-colors">
+                        Brand Kit
+                      </a>
+                      <a href="/vault" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#4a3aff] transition-colors">
+                        My Vault
+                      </a>
+                      <div className="border-t border-gray-50 mt-1 pt-1">
+                        <button 
+                          type="button" 
+                          onClick={() => signOut()} 
+                          className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <button type="button" onClick={() => signIn("google")} className="bg-[#4a3aff] text-white px-7 py-2.5 rounded-md text-sm font-semibold hover:bg-[#3b2de0] transition-colors shadow-md cursor-pointer">
