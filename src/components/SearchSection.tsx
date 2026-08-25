@@ -49,7 +49,7 @@ export default function SearchSection() {
     <div className="w-full">
       {/* Search Bar */}
       <div className="max-w-3xl mx-auto flex flex-col gap-3">
-        <form onSubmit={handleSearch} className="w-full bg-white border border-gray-200 rounded-2xl flex items-center px-4 py-2 sm:py-3 shadow-[0_4px_20px_rgb(0,0,0,0.05)] focus-within:ring-1 focus-within:ring-[#4a3aff]/30 focus-within:border-[#4a3aff]/30 transition-all relative z-20">
+        <form onSubmit={handleSearch} className="w-full bg-white border border-gray-200 rounded-2xl flex items-center px-4 py-2 sm:py-3 shadow-[0_4px_20px_rgb(0,0,0,0.05)] focus-within:ring-1 focus-within:ring-[#4a3aff]/30 focus-within:border-[#4a3aff]/30 transition-all relative">
           <Sparkles className="text-gray-400 w-5 h-5 ml-2 flex-shrink-0" />
           <input
             type="text"
@@ -73,10 +73,11 @@ export default function SearchSection() {
         </form>
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2 px-1 relative z-10">
+        <div className="flex flex-wrap items-center gap-2 px-1 relative">
           {FILTERS.map(filter => (
             <button
               key={filter}
+              type="button"
               onClick={() => setActiveFilter(filter)}
               className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border ${
                 activeFilter === filter 

@@ -53,7 +53,7 @@ Respond strictly in JSON format matching this schema:
 }
 `;
 
-    const modelsToTry = ["gemini-3.5-flash", "gemini-1.5-pro", "gemini-1.5-flash"];
+    const modelsToTry = ["gemini-3.5-flash", "gemini-3.5-pro", "gemini-3.0-flash", "gemini-3.0-pro"];
     let responseText = "";
     let lastError: any = null;
 
@@ -70,7 +70,13 @@ Respond strictly in JSON format matching this schema:
     }
 
     if (!responseText) {
-      throw lastError || new Error("All fallback models failed.");
+      // Professional error handling instead of leaking raw API HTTP errors
+      const isOverloaded = lastError?.message?.includes("503") || lastError?.message?.includes("high demand");
+      const userFriendlyMessage = isOverloaded 
+        ? "RISER AI is currently experiencing unprecedented demand. Please wait a moment and try again."
+        : "Our AI systems are currently undergoing maintenance or experiencing an issue. Please try again shortly.";
+      
+      throw new Error(userFriendlyMessage);
     }
 
     // Parse the JSON block safely. Sometimes the model wraps it in \`\`\`json ... \`\`\`

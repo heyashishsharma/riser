@@ -55,7 +55,7 @@ export default function Home() {
 
             {/* Right: Actions */}
             <div className="flex items-center gap-3">
-              <button className="p-2.5 rounded-md bg-[#f4f3ff] text-[#4a3aff] hover:bg-[#e0e7ff] transition-colors">
+              <button type="button" className="p-2.5 rounded-md bg-[#f4f3ff] text-[#4a3aff] hover:bg-[#e0e7ff] transition-colors cursor-pointer">
                 <Heart className="w-5 h-5 fill-current" />
               </button>
               {session ? (
@@ -63,12 +63,12 @@ export default function Home() {
                   {session.user?.image && (
                     <img src={session.user.image} alt="Profile" className="w-9 h-9 rounded-full border border-gray-200" />
                   )}
-                  <button onClick={() => signOut()} className="bg-white text-gray-700 border border-gray-200 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm">
+                  <button type="button" onClick={() => signOut()} className="bg-white text-gray-700 border border-gray-200 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm cursor-pointer">
                     Sign Out
                   </button>
                 </div>
               ) : (
-                <button onClick={() => signIn("google")} className="bg-[#4a3aff] text-white px-7 py-2.5 rounded-md text-sm font-semibold hover:bg-[#3b2de0] transition-colors shadow-md">
+                <button type="button" onClick={() => signIn("google")} className="bg-[#4a3aff] text-white px-7 py-2.5 rounded-md text-sm font-semibold hover:bg-[#3b2de0] transition-colors shadow-md cursor-pointer">
                   Login
                 </button>
               )}
