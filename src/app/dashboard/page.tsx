@@ -29,16 +29,7 @@ export default async function DashboardPage() {
 
   let dataPoints: any[] = [];
   
-  if (snapshot.empty) {
-     // Just mock some data for the empty state so it looks good
-     dataPoints = [
-        { date: "Day 1", viralPotential: 45, views: 12000 },
-        { date: "Day 2", viralPotential: 52, views: 18000 },
-        { date: "Day 3", viralPotential: 48, views: 15000 },
-        { date: "Day 4", viralPotential: 65, views: 32000 },
-        { date: "Day 5", viralPotential: 82, views: 75000 },
-     ];
-  } else {
+  if (!snapshot.empty) {
      dataPoints = snapshot.docs.map((doc: any, index: number) => {
         const data = doc.data();
         
@@ -121,14 +112,27 @@ export default async function DashboardPage() {
              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                Performance Trajectory
              </h2>
-             {snapshot.empty && (
-               <div className="bg-yellow-50 text-yellow-800 text-sm p-4 rounded-xl mb-6 border border-yellow-200 font-medium">
-                 <strong>Demo Mode:</strong> You haven't run any "Analytics" searches yet. The chart below shows demo data. Try asking the AI to analyze a script to see your real data!
+             {snapshot.empty ? (
+               <div className="flex flex-col items-center justify-center py-16 text-center">
+                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                   <Activity className="w-10 h-10 text-gray-300" />
+                 </div>
+                 <h3 className="text-xl font-semibold text-gray-900 mb-2">No data yet</h3>
+                 <p className="text-gray-500 max-w-sm mx-auto mb-8">
+                   Run your first AI analysis to start tracking your viral potential and projected reach.
+                 </p>
+                 <Link 
+                   href="/"
+                   className="bg-[#4a3aff] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#3b2de0] transition-colors inline-block"
+                 >
+                   Run Analysis
+                 </Link>
+               </div>
+             ) : (
+               <div className="h-[400px] w-full mt-4">
+                  <DashboardCharts data={dataPoints} />
                </div>
              )}
-             <div className="h-[400px] w-full mt-4">
-                <DashboardCharts data={dataPoints} />
-             </div>
           </div>
         </AnimatedChartArea>
 
