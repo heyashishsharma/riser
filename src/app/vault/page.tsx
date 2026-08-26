@@ -1,9 +1,15 @@
+import { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { db } from "@/lib/firebase";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import VaultView from "./VaultView";
+
+export const metadata: Metadata = {
+  title: "My Vault",
+  description: "View your saved AI scripts and analyses.",
+};
 
 export default async function VaultPage() {
   const session = await getServerSession(authOptions);

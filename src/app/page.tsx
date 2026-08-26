@@ -63,6 +63,8 @@ export default function Home() {
                   <button 
                     type="button"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    aria-label="Toggle user menu"
+                    aria-expanded={isMenuOpen}
                     className="flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors cursor-pointer border border-transparent hover:border-gray-200"
                   >
                     <Menu className="w-5 h-5 text-gray-600 ml-1" />
@@ -94,6 +96,7 @@ export default function Home() {
                         <button 
                           type="button" 
                           onClick={() => signOut()} 
+                          aria-label="Sign out"
                           className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                         >
                           Sign Out
@@ -103,7 +106,7 @@ export default function Home() {
                   )}
                 </div>
               ) : (
-                <button type="button" onClick={() => signIn("google")} className="bg-[#4a3aff] text-white px-7 py-2.5 rounded-md text-sm font-semibold hover:bg-[#3b2de0] transition-colors shadow-md cursor-pointer">
+                <button type="button" onClick={() => signIn("google")} aria-label="Sign in with Google" className="bg-[#4a3aff] text-white px-7 py-2.5 rounded-md text-sm font-semibold hover:bg-[#3b2de0] transition-colors shadow-md cursor-pointer">
                   Login
                 </button>
               )}

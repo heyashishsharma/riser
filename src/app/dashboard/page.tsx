@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { db } from "@/lib/firebase";
@@ -6,6 +7,11 @@ import Link from "next/link";
 import { TrendingUp, Activity, Eye, Zap } from "lucide-react";
 import DashboardCharts from "./DashboardCharts";
 import { AnimatedStatCard, AnimatedChartArea } from "./DashboardAnimatedWrapper";
+
+export const metadata: Metadata = {
+  title: "Growth Dashboard",
+  description: "Track your content performance and AI-simulated viral potential.",
+};
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
