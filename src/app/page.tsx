@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { 
@@ -20,18 +20,37 @@ import {
 } from "lucide-react";
 import SearchSection from "@/components/SearchSection";
 
-function NavItem({ icon, label }: { icon: React.ReactNode, label: string }) {
-  return (
+function NavItem({ icon, label, href }: { icon: React.ReactNode, label: string, href?: string }) {
+  const content = (
     <div className="flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 rounded-xl px-4 py-2 transition-colors min-w-[80px]">
       <div className="mb-1">{icon}</div>
-      <span className="text-[13px] text-gray-600 font-medium">{label}</span>
+      <span className="text-[13px] text-gray-600 font-medium whitespace-nowrap">{label}</span>
     </div>
   );
+
+  if (href) {
+    return <a href={href} className="no-underline">{content}</a>;
+  }
+  return content;
 }
 
 export default function Home() {
   const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHoveringDropdown, setIsHoveringDropdown] = useState(false);
+
+  // Auto-close dropdown after 4 seconds
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    if (isMenuOpen && !isHoveringDropdown) {
+      timeoutId = setTimeout(() => {
+        setIsMenuOpen(false);
+      }, 4000);
+    }
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [isMenuOpen, isHoveringDropdown]);
 
   return (
     <main className="min-h-screen bg-white">
@@ -42,24 +61,30 @@ export default function Home() {
           <div className="flex justify-between items-center max-w-7xl mx-auto">
             {/* Left: Logo */}
             <div className="flex items-center gap-2 cursor-pointer">
-              <Image src="/riser.png" alt="RISER Logo" width={400} height={120} className="w-auto h-16 md:h-20 object-contain" priority />
+              <span className="font-black text-3xl md:text-4xl tracking-tight text-gray-900" style={{ fontFamily: 'var(--font-outfit)' }}>
+                RISER.
+              </span>
             </div>
 
             {/* Center: Nav Pills */}
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-1 overflow-x-auto">
               <NavItem icon={<Megaphone className="w-6 h-6 text-[#ec4899]" strokeWidth={1.5} />} label="Campaigns" />
               <NavItem icon={<BarChart className="w-6 h-6 text-gray-400" strokeWidth={1.5} />} label="Analytics" />
               <NavItem icon={<Bot className="w-6 h-6 text-[#60a5fa]" strokeWidth={1.5} />} label="AI Copilot" />
               <NavItem icon={<Briefcase className="w-6 h-6 text-[#ef4444]" strokeWidth={1.5} />} label="Sponsorships" />
-              <NavItem icon={<TrendingUp className="w-6 h-6 text-[#d97706]" strokeWidth={1.5} />} label="Trends" />
-              <NavItem icon={<FileText className="w-6 h-6 text-[#8b5cf6]" strokeWidth={1.5} />} label="Script" />
-              <NavItem icon={<HeartHandshake className="w-6 h-6 text-[#f97316]" strokeWidth={1.5} />} label="Community" />
+              <NavItem icon={<Sparkles className="w-6 h-6 text-[#d97706]" strokeWidth={1.5} />} label="Pitch Generator" href="/outreach" />
+              <NavItem icon={<Search className="w-6 h-6 text-[#8b5cf6]" strokeWidth={1.5} />} label="Competitor Intel" href="/trends" />
+              <NavItem icon={<FileText className="w-6 h-6 text-[#f97316]" strokeWidth={1.5} />} label="Invoicing" href="/invoice" />
             </div>
 
             {/* Right: Actions */}
             <div className="flex items-center gap-3">
               {session ? (
-                <div className="relative">
+                <div 
+                  className="relative"
+                  onMouseEnter={() => setIsHoveringDropdown(true)}
+                  onMouseLeave={() => setIsHoveringDropdown(false)}
+                >
                   <button 
                     type="button"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -115,28 +140,53 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section (Yellow) */}
-      <section className="bg-[#ffe400] relative pt-12 pb-24 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 relative flex justify-center items-center z-10 py-16">
-          {/* Fortune Cookie Style Banner */}
-          <div className="bg-white px-10 py-5 sm:px-16 sm:py-8 transform rotate-[-2deg] shadow-xl relative">
-            <h2 className="text-[2.5rem] sm:text-[4rem] md:text-[5rem] font-black text-black leading-[0.9] text-center" style={{ fontFamily: 'var(--font-outfit)' }}>
-              LET'S GROW<br />FASTER TODAY
-            </h2>
-            {/* Confetti / Paper shards */}
-            <div className="absolute top-[-15px] left-[15%] w-3 h-8 bg-white transform rotate-45"></div>
-            <div className="absolute top-[-25px] left-[35%] w-4 h-6 bg-white transform -rotate-12"></div>
-            <div className="absolute top-[40%] right-[-15px] w-8 h-4 bg-[#f0d8a8] transform rotate-[-30deg]"></div>
-            <div className="absolute top-[60%] left-[-15px] w-6 h-4 bg-[#f0d8a8] transform rotate-[10deg]"></div>
-            <div className="absolute bottom-[-15px] left-[30%] w-6 h-5 bg-[#f0d8a8] transform rotate-[15deg]"></div>
-            <div className="absolute bottom-[-20px] right-[25%] w-4 h-8 bg-white transform -rotate-[25deg]"></div>
+      {/* Hero Section (Light split layout) */}
+      <section className="bg-[#fdfcf8] relative pt-16 lg:pt-28 pb-16 lg:pb-28 overflow-hidden border-b border-gray-100">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 flex flex-col lg:flex-row items-center gap-16 lg:gap-8">
+          
+          {/* Left Text */}
+          <div className="w-full lg:w-1/2 flex flex-col items-start z-10 pt-4 lg:pt-0">
+            <h1 className="text-5xl sm:text-6xl lg:text-[5.5rem] font-black mb-6 text-[#111] leading-[0.95] tracking-tight" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
+              Unforgettable<br />campaigns start<br />with insight.
+            </h1>
+            <p className="text-lg sm:text-xl text-gray-800 mb-10 max-w-xl font-medium leading-relaxed" style={{ fontFamily: 'var(--font-inter)' }}>
+              Influencer marketing built for creators, trusted by brands, and designed for results.
+            </p>
+            
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Button 1: Solid Orange */}
+              <button 
+                className="bg-[#eb4312] hover:bg-[#d63b0e] text-white font-bold text-sm sm:text-base py-3.5 px-8 transition-colors flex items-center gap-2 cursor-pointer"
+                style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)', fontFamily: 'var(--font-outfit)' }}
+              >
+                Start your campaign <span className="text-lg leading-none">&rarr;</span>
+              </button>
+              
+              {/* Button 2: Outlined */}
+              <div 
+                className="bg-[#111] p-[1.5px] inline-block"
+                style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)' }}
+              >
+                <button 
+                  className="bg-[#fdfcf8] hover:bg-gray-50 text-[#111] font-bold text-sm sm:text-base py-[12.5px] px-[30px] transition-colors flex items-center gap-2 cursor-pointer"
+                  style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%)', fontFamily: 'var(--font-outfit)' }}
+                >
+                  Earn as a creator <span className="text-lg leading-none">&rarr;</span>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-        {/* Wavy bottom border SVG */}
-        <div className="absolute bottom-[-2px] left-0 w-full overflow-hidden leading-[0]">
-          <svg className="relative block w-full h-[40px] sm:h-[60px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.08,130.83,114.1,189.92,97.4,233.15,85.16,277.58,64.55,321.39,56.44Z" fill="#ffffff"></path>
-          </svg>
+          
+          {/* Right Image */}
+          <div className="w-full lg:w-1/2 flex justify-center lg:justify-end relative">
+            <div 
+              className="w-full max-w-[650px] aspect-[4/3] bg-gray-100 relative overflow-hidden shadow-sm"
+              style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%)' }}
+            >
+              <img src="/card1.jpg" alt="Influencer Insight" className="w-full h-full object-cover object-top" />
+            </div>
+          </div>
+
         </div>
       </section>
 

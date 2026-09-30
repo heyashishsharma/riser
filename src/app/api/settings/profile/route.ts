@@ -30,12 +30,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { niche, tone, targetAudience } = await req.json();
+    const { niche, tone, targetAudience, handle, bio, followers, engagementRate } = await req.json();
 
     await db.collection("user_profiles").doc(session.user.email).set({
       niche: niche || "",
       tone: tone || "",
       targetAudience: targetAudience || "",
+      handle: handle || "",
+      bio: bio || "",
+      followers: followers || "",
+      engagementRate: engagementRate || "",
       updatedAt: new Date()
     }, { merge: true });
 

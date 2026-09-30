@@ -85,17 +85,45 @@ Respond strictly in JSON format matching this schema:
     const modelsToTry = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-2.5-flash"];
     let responseText = "";
     let lastError: any = null;
+    
+    // Improved Configuration for better response quality
+    const generationConfig = {
+      temperature: 0.7,
+      topP: 0.9,
+      topK: 40,
+      maxOutputTokens: 2048,
+    };
 
     for (const modelName of modelsToTry) {
-      try {
-        const model = genAI.getGenerativeModel({ model: modelName });
-        const result = await model.generateContent(prompt);
-        responseText = result.response.text();
-        break; // Success, exit the loop
-      } catch (err: any) {
-        console.warn(`Model ${modelName} failed. Trying next... Error: ${err.message}`);
-        lastError = err;
+      // Add a small retry loop specifically for handling high traffic (503s/429s) on each model
+      let retries = 2;
+      let success = false;
+      
+      while (retries > 0 && !success) {
+        try {
+          const model = genAI.getGenerativeModel({ model: modelName });
+          const result = await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig,
+          });
+          responseText = result.response.text();
+          success = true;
+          break; // Exit retry loop
+        } catch (err: any) {
+          lastError = err;
+          // If it's a 503 or 429, we wait a moment and try again
+          if (err.message?.includes("503") || err.message?.includes("429") || err.message?.includes("high demand")) {
+            console.warn(`Model ${modelName} hit high traffic. Retrying...`);
+            retries--;
+            if (retries > 0) await new Promise(resolve => setTimeout(resolve, 1500));
+          } else {
+            // If it's a different error, just break out of retry loop and try next model
+            console.warn(`Model ${modelName} failed with error: ${err.message}. Trying next model...`);
+            break;
+          }
+        }
       }
+      if (success) break; // Success, exit model loop
     }
 
     if (!responseText) {

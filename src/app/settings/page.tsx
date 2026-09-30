@@ -4,13 +4,17 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Settings, Save, CheckCircle2 } from "lucide-react";
+import { Settings, Save, CheckCircle2, ExternalLink } from "lucide-react";
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
   const [niche, setNiche] = useState("");
   const [tone, setTone] = useState("");
   const [targetAudience, setTargetAudience] = useState("");
+  const [handle, setHandle] = useState("");
+  const [bio, setBio] = useState("");
+  const [followers, setFollowers] = useState("");
+  const [engagementRate, setEngagementRate] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -29,6 +33,10 @@ export default function SettingsPage() {
             setNiche(data.profile.niche || "");
             setTone(data.profile.tone || "");
             setTargetAudience(data.profile.targetAudience || "");
+            setHandle(data.profile.handle || "");
+            setBio(data.profile.bio || "");
+            setFollowers(data.profile.followers || "");
+            setEngagementRate(data.profile.engagementRate || "");
           }
           setIsLoading(false);
         })
@@ -48,7 +56,7 @@ export default function SettingsPage() {
       const res = await fetch("/api/settings/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ niche, tone, targetAudience })
+        body: JSON.stringify({ niche, tone, targetAudience, handle, bio, followers, engagementRate })
       });
 
       if (res.ok) {
@@ -131,6 +139,82 @@ export default function SettingsPage() {
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#4a3aff]/20 focus:border-[#4a3aff] outline-none transition-all text-sm text-gray-900"
               />
               <p className="mt-1.5 text-xs text-gray-500">Who is your ideal viewer or customer?</p>
+            </div>
+
+            <div className="pt-6 mt-6 border-t border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 mb-1" style={{ fontFamily: 'var(--font-outfit)' }}>Media Kit Details</h2>
+                  <p className="text-sm text-gray-500">This information will be displayed on your public Media Kit.</p>
+                </div>
+                {handle && (
+                  <a
+                    href={`/creator/${handle}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 sm:mt-0 inline-flex items-center text-sm font-medium text-[#4a3aff] hover:text-[#3b2de0] bg-[#f0f7ff] hover:bg-[#e0efff] px-4 py-2 rounded-lg transition-colors"
+                  >
+                    View Media Kit
+                    <ExternalLink className="w-4 h-4 ml-2" />
+                  </a>
+                )}
+              </div>
+              
+              <div className="space-y-6">
+                <div>
+                  <label htmlFor="handle" className="block text-sm font-semibold text-gray-900 mb-2">Creator Handle (URL Slug)</label>
+                  <div className="flex rounded-xl shadow-sm">
+                    <span className="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-gray-200 bg-gray-50 text-gray-500 text-sm">
+                      riser.com/creator/
+                    </span>
+                    <input
+                      type="text"
+                      id="handle"
+                      value={handle}
+                      onChange={(e) => setHandle(e.target.value)}
+                      placeholder="username"
+                      className="flex-1 block w-full min-w-0 rounded-none rounded-r-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#4a3aff]/20 focus:border-[#4a3aff] outline-none transition-all text-sm text-gray-900 px-4 py-3"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="bio" className="block text-sm font-semibold text-gray-900 mb-2">Short Bio</label>
+                  <textarea
+                    id="bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Tell brands what makes you unique..."
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#4a3aff]/20 focus:border-[#4a3aff] outline-none transition-all text-sm text-gray-900 resize-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="followers" className="block text-sm font-semibold text-gray-900 mb-2">Total Followers</label>
+                    <input
+                      type="text"
+                      id="followers"
+                      value={followers}
+                      onChange={(e) => setFollowers(e.target.value)}
+                      placeholder="e.g. 500K"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#4a3aff]/20 focus:border-[#4a3aff] outline-none transition-all text-sm text-gray-900"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="engagementRate" className="block text-sm font-semibold text-gray-900 mb-2">Avg. Engagement Rate</label>
+                    <input
+                      type="text"
+                      id="engagementRate"
+                      value={engagementRate}
+                      onChange={(e) => setEngagementRate(e.target.value)}
+                      placeholder="e.g. 5.2%"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#4a3aff]/20 focus:border-[#4a3aff] outline-none transition-all text-sm text-gray-900"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="pt-4 flex items-center justify-between border-t border-gray-100">
